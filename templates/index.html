@@ -61,25 +61,13 @@
 							>First name</label
 						>
 						<div class="col-sm-12">
-							<input
-								type="text"
-								name="fName"
-								id="fName"
-								class="form-control"
-								value="{{ session['fName'] }}"
-							/>
+							<input type="text" name="fName" id="fName" class="form-control" />
 						</div>
 					</div>
 					<div class="form-group col-sm-12">
 						<label for="lName" class="col-sm-8 col-form-label">Last Name</label>
 						<div class="col-sm-12">
-							<input
-								type="text"
-								name="lName"
-								id="lName"
-								class="form-control"
-								value="{{ session['lName'] }}"
-							/>
+							<input type="text" name="lName" id="lName" class="form-control" />
 						</div>
 					</div>
 					<div class="form-group col-sm-12">
@@ -91,6 +79,30 @@
 								id="email"
 								class="form-control"
 								value="{{ session['email'] }}"
+							/>
+						</div>
+					</div>
+					<div class="form-group col-sm-12">
+						<label for="gender" class="col-sm-8 col-form-label">Gender</label>
+						<div class="col-sm-12">
+							<select name="gender" id="gender" class="form-control">
+								<option value="0" selected></option>
+								<option value="1">Male</option>
+								<option value="2">Female</option>
+								<option value="3">Decline</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group col-sm-12">
+						<label for="birthday" class="col-sm-8 col-form-label"
+							>Birthday</label
+						>
+						<div class="col-sm-12">
+							<input
+								type="date"
+								name="birthday"
+								id="birthday"
+								class="form-control"
 							/>
 						</div>
 					</div>

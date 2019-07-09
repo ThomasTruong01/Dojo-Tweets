@@ -3,9 +3,12 @@
 -- Model: New Model    Version: 1.0
 -- MySQL Workbench Forward Engineering
 
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS
+, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS
+, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE
+, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
 -- Schema dojo_tweets
@@ -14,111 +17,167 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema dojo_tweets
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `dojo_tweets` DEFAULT CHARACTER SET utf8 ;
-USE `dojo_tweets` ;
+CREATE SCHEMA
+IF NOT EXISTS `dojo_tweets` DEFAULT CHARACTER
+SET utf8 ;
+USE `dojo_tweets`
+;
 
 -- -----------------------------------------------------
 -- Table `dojo_tweets`.`gender`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `dojo_tweets`.`gender` (
+CREATE TABLE
+IF NOT EXISTS `dojo_tweets`.`gender`
+(
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
+  `name` VARCHAR
+(45) NULL,
+  PRIMARY KEY
+(`id`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
 -- Table `dojo_tweets`.`likes`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `dojo_tweets`.`likes` (
+CREATE TABLE
+IF NOT EXISTS `dojo_tweets`.`likes`
+(
   `id` INT NOT NULL AUTO_INCREMENT,
   `users_id` INT NOT NULL,
   `created_on` DATETIME NULL,
   `updated_on` DATETIME NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_likes_users1_idx` (`users_id` ASC) VISIBLE,
+  PRIMARY KEY
+(`id`),
+  INDEX `fk_likes_users1_idx`
+(`users_id` ASC) VISIBLE,
   CONSTRAINT `fk_likes_users1`
-    FOREIGN KEY (`users_id`)
-    REFERENCES `dojo_tweets`.`users` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    FOREIGN KEY
+(`users_id`)
+    REFERENCES `dojo_tweets`.`users`
+(`id`)
+    ON
+DELETE NO ACTION
+    ON
+UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
 -- Table `dojo_tweets`.`tweets`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `dojo_tweets`.`tweets` (
+CREATE TABLE
+IF NOT EXISTS `dojo_tweets`.`tweets`
+(
   `id` INT NOT NULL AUTO_INCREMENT,
-  `tweets` VARCHAR(45) NULL,
+  `tweets` VARCHAR
+(45) NULL,
   `created_on` DATETIME NULL,
   `updated_on` DATETIME NULL,
   `likes_id` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_tweets_likes1_idx` (`likes_id` ASC) VISIBLE,
+  PRIMARY KEY
+(`id`),
+  INDEX `fk_tweets_likes1_idx`
+(`likes_id` ASC) VISIBLE,
   CONSTRAINT `fk_tweets_likes1`
-    FOREIGN KEY (`likes_id`)
-    REFERENCES `dojo_tweets`.`likes` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    FOREIGN KEY
+(`likes_id`)
+    REFERENCES `dojo_tweets`.`likes`
+(`id`)
+    ON
+DELETE NO ACTION
+    ON
+UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
 -- Table `dojo_tweets`.`followers`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `dojo_tweets`.`followers` (
+CREATE TABLE
+IF NOT EXISTS `dojo_tweets`.`followers`
+(
   `id` INT NOT NULL AUTO_INCREMENT,
   `follower_id` INT NULL,
   `users_id` INT NOT NULL,
   `created_on` DATETIME NULL,
   `updated_on` DATETIME NULL DEFAULT `,
-  PRIMARY KEY (`id`),
-  INDEX `fk_followers_users1_idx` (`users_id` ASC) VISIBLE,
+  PRIMARY KEY
+(`id`),
+  INDEX `fk_followers_users1_idx`
+(`users_id` ASC) VISIBLE,
   CONSTRAINT `fk_followers_users1`
-    FOREIGN KEY (`users_id`)
-    REFERENCES `dojo_tweets`.`users` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    FOREIGN KEY
+(`users_id`)
+    REFERENCES `dojo_tweets`.`users`
+(`id`)
+    ON
+DELETE NO ACTION
+    ON
+UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
 -- Table `dojo_tweets`.`users`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `dojo_tweets`.`users` (
+CREATE TABLE
+IF NOT EXISTS `dojo_tweets`.`users`
+(
   `id` INT NOT NULL AUTO_INCREMENT,
-  `first_name` VARCHAR(255) NOT NULL,
-  `last_name` VARCHAR(45) NOT NULL,
-  `email` VARCHAR(45) NOT NULL,
+  `first_name` VARCHAR
+(255) NOT NULL,
+  `last_name` VARCHAR
+(45) NOT NULL,
+  `email` VARCHAR
+(45) NOT NULL,
   `birthday` DATETIME NULL,
   `created_on` DATETIME NOT NULL,
   `updated_on` DATETIME NOT NULL,
   `gender_id` INT NOT NULL,
   `tweets_id` INT NOT NULL,
   `followers_id` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_users_gender_idx` (`gender_id` ASC) VISIBLE,
-  INDEX `fk_users_tweets1_idx` (`tweets_id` ASC) VISIBLE,
-  INDEX `fk_users_followers1_idx` (`followers_id` ASC) VISIBLE,
+  PRIMARY KEY
+(`id`),
+  INDEX `fk_users_gender_idx`
+(`gender_id` ASC) VISIBLE,
+  INDEX `fk_users_tweets1_idx`
+(`tweets_id` ASC) VISIBLE,
+  INDEX `fk_users_followers1_idx`
+(`followers_id` ASC) VISIBLE,
   CONSTRAINT `fk_users_gender`
-    FOREIGN KEY (`gender_id`)
-    REFERENCES `dojo_tweets`.`gender` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    FOREIGN KEY
+(`gender_id`)
+    REFERENCES `dojo_tweets`.`gender`
+(`id`)
+    ON
+DELETE NO ACTION
+    ON
+UPDATE NO ACTION,
   CONSTRAINT `fk_users_tweets1`
-    FOREIGN KEY (`tweets_id`)
-    REFERENCES `dojo_tweets`.`tweets` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    FOREIGN KEY
+(`tweets_id`)
+    REFERENCES `dojo_tweets`.`tweets`
+(`id`)
+    ON
+DELETE NO ACTION
+    ON
+UPDATE NO ACTION,
   CONSTRAINT `fk_users_followers1`
-    FOREIGN KEY (`followers_id`)
-    REFERENCES `dojo_tweets`.`followers` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    FOREIGN KEY
+(`followers_id`)
+    REFERENCES `dojo_tweets`.`followers`
+(`id`)
+    ON
+DELETE NO ACTION
+    ON
+UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+SET SQL_MODE
+=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS
+=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS
+=@OLD_UNIQUE_CHECKS;

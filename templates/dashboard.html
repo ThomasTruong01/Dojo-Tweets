@@ -31,6 +31,7 @@
 			type="text/css"
 			href="{{ url_for('static', filename='style.css') }}"
 		/>
+		<script src="{{ url_for('static', filename='js/jquery.timeago.js') }}"></script>
 		<link rel="stylesheet" href="../static/style.css" />
 		<style>
 			.card {
@@ -58,29 +59,44 @@
 		<main>
 			<h1>Write a Tweet:</h1>
 			<div class="writeTweet card col-sm-4">
+				<div class="errMsg">
+					<!-- declare a variable called messages -->
+					{% with messages = get_flashed_messages() %}
+					<!-- check if there are any messages -->
+					{% if messages %}
+					<!-- loop through the messages -->
+					{% for message in messages %}
+					<!-- display each message in a paragraph tag -->
+					<p>{{ message }}</p>
+					{% endfor %} {% endif %} {% endwith %}
+				</div>
 				<h6 class="card-subtitle" id="wordCount">0/255</h6>
 				<form action="/tweets/create" method="post">
-					<textarea name="tweet" id="tweet" cols="30" rows="6"></textarea>
-
+					<textarea name="tweet" id="tweet" cols="30" rows="6">{{
+						session['tweet']
+					}}</textarea>
 					<input type="submit" value="tweet" class="btn btn-primary" />
 				</form>
 			</div>
 			<div class="feed">
 				<h1>Your Feed:</h1>
+				{% for tweet in myFeed %}
 				<div class="card tweet col-sm-4">
 					<div class="card-body tweetData ">
 						<h5 class="card-title">
-							Thomas Truong says:
+							{{ tweet['first_name'] }} {{ tweet['last_name'] }} says:
 						</h5>
 						<p class="card-text">
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit. Unde
-							nulla repudiandae hic enim ipsa. Delectus autem ipsa excepturi
-							ullam soluta, reprehenderit consequatur pariatur vitae obcaecati
-							ad, ab eaque similique! Temporibus quisquam laborum magnam nobis,
-							deleniti quia nemo possimus est perspiciatis.
+							{{ tweet['tweets'] }}
+						</p>
+					</div>
+					<div class="card-footer">
+						<p class="time-ago">
+							{{ tweet['created_on'] }}
 						</p>
 					</div>
 				</div>
+				{% endfor %}}
 			</div>
 		</main>
 		<script>
@@ -96,6 +112,9 @@
 			$('#tweet').keyup(function(val) {
 				var myLen = $(this).val().length;
 				$('#wordCount').text(myLen + '/255');
+			});
+			$('.time-ago').each(function() {
+				$(this).text(jQuery.timeago($(this).text()));
 			});
 		</script>
 	</body>

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, flash, request, session
+from datetime import datetime
 from mysqlconnection import MySQLConnection
 from validate_email import validate_email
 from flask_bcrypt import Bcrypt
@@ -14,7 +15,7 @@ def main():
         if session['login']:
             return render_template('success.html')
     else:
-        return render_template('index.html')
+        return redirect('/dashboard')
 
 
 @app.route('/process', methods=['POST'])
@@ -41,7 +42,7 @@ def process():
         flash('Please enter in a valid email.')
 
     if is_valid:
-        mySql = MySQLConnection('basic_regstration')
+        mySql = MySQLConnection('dojo_tweets')
         query = 'SELECT count(email) as "UserCreated" FROM users WHERE email = %(em)s'
         data = {'em': request.form['email']}
         UserCreated = mySql.query_db(query, data)
@@ -79,13 +80,14 @@ def process():
         is_valid = False
 
     if is_valid:
-        mySql = MySQLConnection('basic_regstration')
-        query = 'INSERT INTO users (first_name, last_name, email, password, created_on, updated_on) ' +\
-            'VALUES (%(fn)s, %(ln)s, %(em)s, %(pw)s,now(),now())'
+        mySql = MySQLConnection('dojo_tweets')
+        query = 'INSERT INTO users (first_name, last_name, email, password, gender_id, birthday, created_on, updated_on) ' +\
+            'VALUES (%(fn)s, %(ln)s, %(em)s, %(pw)s, %(gen)s, %(bday)s, now(),now())'
         pw = bcrypt.generate_password_hash(request.form['pw1'])
 
         data = {'fn': request.form['fName'], 'ln': request.form['lName'],
-                'em': request.form['email'], 'pw': pw}
+                'em': request.form['email'], 'pw': pw, 'gen': request.form['gender'],
+                'bday': request.form['birthday']}
         mySql.query_db(query, data)
         flash('User created!')
     return redirect('/')
@@ -94,15 +96,16 @@ def process():
 @app.route('/login', methods=['POST'])
 def login():
     print(request.form)
-    mySql = MySQLConnection('basic_regstration')
+    mySql = MySQLConnection('dojo_tweets')
     query = 'SELECT * FROM users WHERE email = %(em)s'
     data = {'em': request.form['email']}
     pw = bcrypt.generate_password_hash(request.form['pw1'])
     pw_hash = mySql.query_db(query, data)
     print('*'*50)
-    print('pw_hash', pw_hash[0]['password'])
+    print('pw_hash', pw_hash)
     print('pw   ', pw)
     print('*'*50)
+    session['userId'] = pw_hash[0]['id']
     session['fName'] = pw_hash[0]['first_name']
     session['lName'] = pw_hash[0]['last_name']
     session['email'] = pw_hash[0]['email']
@@ -120,13 +123,44 @@ def login():
 def success():
     if session.get('login'):
         if session['login']:
-            return render_template('dashboard.html')
+            return redirect('/dashboard')
     else:
         return redirect('/')
 
 
+@app.route('/dashboard')
+def dashboard():
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'select first_name, last_name, tweets, tweets.created_on as "created_on" from users LEFT JOIN tweets on users.id = users_id ORDER BY tweets.id desc'
+
+    myFeed = mySql.query_db(query)
+
+    return render_template('dashboard.html', myFeed=myFeed)
+
+
 @app.route('/tweets/create', methods=['POST'])
 def createTweet():
+    session['tweet'] = request.form['tweet']
+    is_valid = True
+    if len(request.form['tweet'].strip()) < 1:
+        is_valid = False
+        flash('You forgot to write your tweet...')
+        session.pop('tweet')
+
+    if len(request.form['tweet'].strip()) > 255:
+        is_valid = False
+        flash('Your tweet is too long!')
+        session['tweet'] = request.form['tweet']
+
+    if is_valid:
+        mySql = MySQLConnection('dojo_tweets')
+        query = 'INSERT INTO tweets (tweets, users_id, created_on, updated_on) VALUES (%(tweets)s, %(id)s, now(), now())'
+        data = {'tweets': request.form['tweet'].strip(
+        ), 'id': session['userId']}
+        mySql.query_db(query, data)
+        session.pop('tweet')
+
+    return redirect('/dashboard')
 
 
 @app.route('/logout')
