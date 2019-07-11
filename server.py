@@ -11,11 +11,14 @@ bcrypt = Bcrypt(app)
 
 @app.route('/')
 def main():
-    if session.get('login'):
-        if session['login']:
+
+    if 'login' in session:
+        if session['login'] == True:
             return render_template('success.html')
+        else:
+            return render_template('index.html')
     else:
-        return redirect('/dashboard')
+        return render_template('index.html')
 
 
 @app.route('/process', methods=['POST'])
@@ -46,9 +49,7 @@ def process():
         query = 'SELECT count(email) as "UserCreated" FROM users WHERE email = %(em)s'
         data = {'em': request.form['email']}
         UserCreated = mySql.query_db(query, data)
-        print(UserCreated)
         UserCreated = UserCreated[0]['UserCreated'] > 0
-        print(UserCreated)
     if UserCreated:
         is_valid = False
         flash('Email has been taken, please use a different email.')
@@ -95,21 +96,15 @@ def process():
 
 @app.route('/login', methods=['POST'])
 def login():
-    print(request.form)
     mySql = MySQLConnection('dojo_tweets')
     query = 'SELECT * FROM users WHERE email = %(em)s'
     data = {'em': request.form['email']}
-    pw = bcrypt.generate_password_hash(request.form['pw1'])
+    # pw = bcrypt.generate_password_hash(request.form['pw1'])
     pw_hash = mySql.query_db(query, data)
-    print('*'*50)
-    print('pw_hash', pw_hash)
-    print('pw   ', pw)
-    print('*'*50)
     session['userId'] = pw_hash[0]['id']
     session['fName'] = pw_hash[0]['first_name']
     session['lName'] = pw_hash[0]['last_name']
     session['email'] = pw_hash[0]['email']
-    print(session)
     if bcrypt.check_password_hash(
             pw_hash[0]['password'], request.form['pw1']):
         session['login'] = True
@@ -131,9 +126,10 @@ def success():
 @app.route('/dashboard')
 def dashboard():
     mySql = MySQLConnection('dojo_tweets')
-    query = 'select first_name, last_name, tweets, tweets.created_on as "created_on" from users LEFT JOIN tweets on users.id = users_id ORDER BY tweets.id desc'
-
-    myFeed = mySql.query_db(query)
+    query = 'SELECT users.id as "userId", first_name, last_name, tweets.id as "tweetId", tweets, tweets.created_on as "created_on", likes, liked FROM users LEFT JOIN tweets ON users.id = %(uid)s LEFT JOIN (select tweets_id, count(id) as "likes" from likes GROUP BY tweets_id) as mylikes ON tweets.id = mylikes.tweets_id LEFT JOIN (SELECT users_id as "uid", tweets_id, count(likes.id)>0 as "liked" FROM likes GROUP BY tweets_id, users_id) as liked ON liked.uid = tweets.users_id and liked.tweets_id = tweets.id ORDER BY tweets.id desc'
+    data = {'uid': session['userId']}
+    myFeed = mySql.query_db(query, data)
+    # print(myFeed)
 
     return render_template('dashboard.html', myFeed=myFeed)
 
@@ -165,9 +161,49 @@ def createTweet():
 
 @app.route('/logout')
 def logout():
-    session['login'] = False
+    if 'login' in session:
+        session.pop('login')
     session.clear()
     return redirect('/')
+
+
+@app.route('/tweets/<tweetId>/add_like', methods=['POST'])
+def like(tweetId):
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'INSERT INTO likes (tweets_id, users_id, created_on, updated_on) ' +\
+        'VALUES (%(tid)s, %(uId)s, now(), now())'
+    data = {'tid': tweetId, 'uId': request.form['uId']}
+    print(request.form)
+    mySql.query_db(query, data)
+    return redirect('/dashboard')
+
+
+@app.route('/tweets/<tweetId>/delete_like', methods=['POST'])
+def del_like(tweetId):
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'DELETE FROM likes WHERE tweets_id = %(tid)s and users_id = %(uId)s'
+    data = {'tid': tweetId, 'uId': request.form['uId']}
+    print(request.form)
+    mySql.query_db(query, data)
+    return redirect('/dashboard')
+
+
+@app.route('/tweets/<tweetId>/delete', methods=['POST'])
+def delete_tweet(tweetId):
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'DELETE FROM likes WHERE tweets_id = %(tid)s'
+    data = {'tid': tweetId}
+    mySql.query_db(query, data)
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'DELETE FROM tweets WHERE id = %(tid)s'
+    data = {'tid': tweetId}
+    mySql.query_db(query, data)
+    print("*"*50)
+    print("*"*50)
+    print('tweet deleted')
+    print("*"*50)
+    print("*"*50)
+    return redirect('/dashboard')
 
 
 if __name__ == "__main__":

@@ -94,9 +94,54 @@
 						<p class="time-ago">
 							{{ tweet['created_on'] }}
 						</p>
+						{% if tweet['likes'] != None: %}
+						<p style="margin: 0">likes: {{ tweet['likes'] }}</p>
+
+						{% endif %}
+						<div class="d-flex justify-content-between">
+							{% if tweet['liked']==1: %}
+							<form
+								action="/tweets/{{ tweet['tweetId'] }}/delete_like"
+								method="post"
+							>
+								<input
+									type="hidden"
+									name="uId"
+									value="{{ session['userId'] }}"
+								/>
+								<input type="submit" value="Unliked" />
+							</form>
+							{% else %}
+							<form
+								action="/tweets/{{ tweet['tweetId'] }}/add_like"
+								method="post"
+							>
+								<input
+									type="hidden"
+									name="uId"
+									value="{{ session['userId'] }}"
+								/>
+								<input type="submit" value="Like" />
+							</form>
+							{% endif %} {% if tweet['userId']==session['userId']:%}
+
+							<form
+								action="/tweets/{{ tweet['tweetId'] }}/delete"
+								method="post"
+								class="d-inline-flex"
+							>
+								<input
+									type="hidden"
+									name="uId"
+									value="{{ session['userId'] }}"
+								/>
+								<input type="submit" value="Delete" class="d-inline-flex" />
+							</form>
+							{% endif %}
+						</div>
 					</div>
 				</div>
-				{% endfor %}}
+				{% endfor %}
 			</div>
 		</main>
 		<script>
