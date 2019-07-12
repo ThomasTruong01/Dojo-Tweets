@@ -101,7 +101,7 @@
 
 						{% endif %}
 						<div class="d-flex justify-content-between">
-							{% if tweet['liked']==1: %}
+							{% if tweet['liked']==1 %}
 							<form
 								action="/tweets/{{ tweet['tweetId'] }}/delete_like"
 								method="post"
@@ -173,6 +173,9 @@
 				{% endfor %}
 			</div>
 		</main>
+		{% for tweet in myFeed %}
+		<p>{{ tweet }}</p>
+		{% endfor %}
 		<script>
 			// function charCount(val) {
 			// 	var len = val.value.length;

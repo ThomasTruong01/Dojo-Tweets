@@ -126,10 +126,10 @@ def success():
 @app.route('/dashboard')
 def dashboard():
     mySql = MySQLConnection('dojo_tweets')
-    query = 'SELECT users.id as "userId", first_name, last_name, tweets.id as "tweetId", tweets, tweets.created_on as "created_on", likes, liked FROM users LEFT JOIN tweets ON users.id = %(uid)s LEFT JOIN (select tweets_id, count(id) as "likes" from likes GROUP BY tweets_id) as mylikes ON tweets.id = mylikes.tweets_id LEFT JOIN (SELECT users_id as "uid", tweets_id, count(likes.id)>0 as "liked" FROM likes GROUP BY tweets_id, users_id) as liked ON liked.uid = tweets.users_id and liked.tweets_id = tweets.id ORDER BY tweets.id desc'
+    query = 'SELECT users.id as "userId", first_name, last_name, tweets.id as "tweetId", tweets, tweets.created_on as "created_on", likes, liked FROM tweets JOIN users ON users.id = tweets.users_id LEFT JOIN (select tweets_id, count(id) as "likes" from likes GROUP BY tweets_id) as mylikes ON tweets.id = mylikes.tweets_id LEFT JOIN (SELECT users_id as "uid", tweets_id, count(likes.id)>0 as "liked" FROM likes GROUP BY tweets_id, users_id) as liked ON liked.uid = %(uid)s and liked.tweets_id = tweets.id ORDER BY tweets.id desc'
     data = {'uid': session['userId']}
     myFeed = mySql.query_db(query, data)
-    # print(myFeed)
+    print(session)
 
     return render_template('dashboard.html', myFeed=myFeed)
 
