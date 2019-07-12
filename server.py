@@ -206,5 +206,29 @@ def delete_tweet(tweetId):
     return redirect('/dashboard')
 
 
+@app.route('/tweets/<tweetId>/edit', methods=['POST'])
+def edit_tweet(tweetId, methods=['POST']):
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'Select * FROM tweets WHERE id = %(tid)s'
+    data = {'tid': tweetId}
+    myTweet = mySql.query_db(query, data)
+    # print(myTweet)
+    return render_template("edit.html", myTweet=myTweet[0])
+
+
+@app.route('/tweets/<tweetId>/update', methods=['POST'])
+def update_tweet(tweetId, methods=['POST']):
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'UPDATE tweets Set tweets = %(tweet)s, updated_on = now() WHERE id = %(tid)s'
+    data = {'tweet': request.form['tweet'], 'tid': tweetId}
+    mySql.query_db(query, data)
+    print("*"*50)
+    print("*"*50)
+    print(query)
+    print("*"*50)
+    print("*"*50)
+    return redirect('/dashboard')
+
+
 if __name__ == "__main__":
     app.run(debug=True)

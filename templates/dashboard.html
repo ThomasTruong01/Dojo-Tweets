@@ -32,6 +32,8 @@
 			href="{{ url_for('static', filename='style.css') }}"
 		/>
 		<script src="{{ url_for('static', filename='js/jquery.timeago.js') }}"></script>
+
+		<script src="https://kit.fontawesome.com/e3d6e9bfcd.js"></script>
 		<link rel="stylesheet" href="../static/style.css" />
 		<style>
 			.card {
@@ -109,7 +111,10 @@
 									name="uId"
 									value="{{ session['userId'] }}"
 								/>
-								<input type="submit" value="Unliked" />
+								<button type="submit" class="btn btn-primary btn-sm">
+									<i class="far fa-thumbs-up"> </i>
+									Unliked
+								</button>
 							</form>
 							{% else %}
 							<form
@@ -121,7 +126,27 @@
 									name="uId"
 									value="{{ session['userId'] }}"
 								/>
-								<input type="submit" value="Like" />
+								<button type="submit" class="btn btn-primary btn-sm">
+									<i class="far fa-thumbs-up"> </i>Like
+								</button>
+							</form>
+							{% endif %} {% if tweet['userId']==session['userId']:%}
+
+							<form
+								action="/tweets/{{ tweet['tweetId'] }}/edit"
+								method="post"
+								class="d-inline-flex"
+							>
+								<input
+									type="hidden"
+									name="uId"
+									value="{{ session['userId'] }}"
+								/>
+								<input
+									type="submit"
+									value="Edit"
+									class="d-inline-flex btn btn-secondary btn-sm"
+								/>
 							</form>
 							{% endif %} {% if tweet['userId']==session['userId']:%}
 
@@ -135,7 +160,11 @@
 									name="uId"
 									value="{{ session['userId'] }}"
 								/>
-								<input type="submit" value="Delete" class="d-inline-flex" />
+								<input
+									type="submit"
+									value="Delete"
+									class="d-inline-flex btn btn-secondary btn-sm"
+								/>
 							</form>
 							{% endif %}
 						</div>

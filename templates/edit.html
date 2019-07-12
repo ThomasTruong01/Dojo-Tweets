@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Welcome {{ session['fName'] }}</title>
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+		<script
+			src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+			integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+			integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+			integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+			crossorigin="anonymous"
+		></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="{{ url_for('static', filename='style.css') }}"
+		/>
+		<script src="{{ url_for('static', filename='js/jquery.timeago.js') }}"></script>
+
+		<script src="https://kit.fontawesome.com/e3d6e9bfcd.js"></script>
+		<!-- <link rel="stylesheet" href="../static/style.css" /> -->
+		<style>
+			.card {
+				margin: 25px;
+				margin-left: 50px;
+				padding: 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-dark bg-dark">
+			<a class="navbar-brand" href="#">
+				<img
+					src="https://cutecdn.codingdojo.com/images/global/coding_dojo_logo_white_new.png"
+					class="d-inline-block align-top"
+					alt=""
+				/>
+			</a>
+			<p></p>
+			<p class="h3 text-light">Welcome {{ session['fName'] }}</p>
+			<p class="btn btn-outline-primary my-2 my-sm-0 link- bg-primary">
+				<a href="./logout" style="color: white">log out</a>
+			</p>
+		</nav>
+		<main>
+			<h1>Edit Your Tweet:</h1>
+			<div class="writeTweet card col-sm-4">
+				<div class="errMsg">
+					<!-- declare a variable called messages -->
+					{% with messages = get_flashed_messages() %}
+					<!-- check if there are any messages -->
+					{% if messages %}
+					<!-- loop through the messages -->
+					{% for message in messages %}
+					<!-- display each message in a paragraph tag -->
+					<p>{{ message }}</p>
+					{% endfor %} {% endif %} {% endwith %}
+				</div>
+				<h6 class="card-subtitle" id="wordCount">0/255</h6>
+				<form action="/tweets/{{ myTweet['id'] }}/update" method="post">
+					<textarea name="tweet" id="tweet" cols="30" rows="6">{{
+						myTweet['tweets']
+					}}</textarea>
+					<input type="submit" value="Save" class="btn btn-primary" />
+				</form>
+			</div>
+		</main>
+	</body>
+</html>
