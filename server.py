@@ -216,16 +216,31 @@ def edit_tweet(tweetId, methods=['POST']):
 
 @app.route('/tweets/<tweetId>/update', methods=['POST'])
 def update_tweet(tweetId, methods=['POST']):
-    mySql = MySQLConnection('dojo_tweets')
-    query = 'UPDATE tweets Set tweets = %(tweet)s, updated_on = now() WHERE id = %(tid)s'
-    data = {'tweet': request.form['tweet'], 'tid': tweetId}
-    mySql.query_db(query, data)
-    print("*"*50)
-    print("*"*50)
-    print(query)
-    print("*"*50)
-    print("*"*50)
-    return redirect('/dashboard')
+    session['tweet'] = request.form['tweet']
+    is_valid = True
+    if len(request.form['tweet'].strip()) < 1:
+        is_valid = False
+        flash('You forgot to write your tweet...')
+        session.pop('tweet')
+
+    if len(request.form['tweet'].strip()) > 255:
+        is_valid = False
+        flash('Your tweet is too long!')
+        session['tweet'] = request.form['tweet']
+
+    if is_valid:
+        mySql = MySQLConnection('dojo_tweets')
+        query = 'UPDATE tweets Set tweets = %(tweet)s, updated_on = now() WHERE id = %(tid)s'
+        data = {'tweet': request.form['tweet'], 'tid': tweetId}
+        mySql.query_db(query, data)
+        session.pop('tweet')
+        return redirect('/dashboard')
+    else:
+        mySql = MySQLConnection('dojo_tweets')
+        query = 'Select * FROM tweets WHERE id = %(tid)s'
+        data = {'tid': tweetId}
+        myTweet = mySql.query_db(query, data)
+        return render_template("edit.html", myTweet=myTweet[0])
 
 
 if __name__ == "__main__":
