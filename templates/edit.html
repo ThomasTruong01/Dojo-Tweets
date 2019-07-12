@@ -54,7 +54,7 @@
 			</a>
 			<p></p>
 			<p class="h3 text-light">Welcome {{ session['fName'] }}</p>
-			<p class="btn btn-outline-primary my-2 my-sm-0 link- bg-primary">
+			<p class="btn btn-outline-primary my-2 my-sm-0 link- bg-primary btn-sm">
 				<a href="./logout" style="color: white">log out</a>
 			</p>
 		</nav>
@@ -77,7 +77,13 @@
 					<textarea name="tweet" id="tweet" cols="30" rows="6">{{
 						myTweet['tweets']
 					}}</textarea>
-					<input type="submit" value="Save" class="btn btn-primary" />
+					<input type="submit" value="Save" class="btn btn-primary btn-sm" />
+					<input
+						type="button"
+						value="Cancel"
+						onclick="window.location.href='../../dashboard'"
+						class="btn btn-secondary btn-sm"
+					/>
 				</form>
 			</div>
 		</main>

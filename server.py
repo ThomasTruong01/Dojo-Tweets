@@ -14,7 +14,7 @@ def main():
 
     if 'login' in session:
         if session['login'] == True:
-            return render_template('success.html')
+            return redirect('/dashboard')
         else:
             return render_template('index.html')
     else:
@@ -99,7 +99,6 @@ def login():
     mySql = MySQLConnection('dojo_tweets')
     query = 'SELECT * FROM users WHERE email = %(em)s'
     data = {'em': request.form['email']}
-    # pw = bcrypt.generate_password_hash(request.form['pw1'])
     pw_hash = mySql.query_db(query, data)
     session['userId'] = pw_hash[0]['id']
     session['fName'] = pw_hash[0]['first_name']
@@ -129,7 +128,6 @@ def dashboard():
     query = 'SELECT users.id as "userId", first_name, last_name, tweets.id as "tweetId", tweets, tweets.created_on as "created_on", likes, liked FROM tweets JOIN users ON users.id = tweets.users_id LEFT JOIN (select tweets_id, count(id) as "likes" from likes GROUP BY tweets_id) as mylikes ON tweets.id = mylikes.tweets_id LEFT JOIN (SELECT users_id as "uid", tweets_id, count(likes.id)>0 as "liked" FROM likes GROUP BY tweets_id, users_id) as liked ON liked.uid = %(uid)s and liked.tweets_id = tweets.id ORDER BY tweets.id desc'
     data = {'uid': session['userId']}
     myFeed = mySql.query_db(query, data)
-    print(session)
 
     return render_template('dashboard.html', myFeed=myFeed)
 

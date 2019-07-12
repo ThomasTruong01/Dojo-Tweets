@@ -44,8 +44,8 @@
 		</style>
 	</head>
 	<body>
-		<nav class="navbar navbar-dark bg-dark">
-			<a class="navbar-brand" href="#">
+		<nav class="navbar navbar-dark bg-dark d-flex">
+			<a class="navbar-brand mr-auto p2" href="#">
 				<img
 					src="https://cutecdn.codingdojo.com/images/global/coding_dojo_logo_white_new.png"
 					class="d-inline-block align-top"
@@ -53,8 +53,10 @@
 				/>
 			</a>
 			<p></p>
-			<p class="h3 text-light">Welcome {{ session['fName'] }}</p>
-			<p class="btn btn-outline-primary my-2 my-sm-0 link- bg-primary">
+			<p class="h3 text-light p-2">Welcome {{ session['fName'] }}</p>
+			<p
+				class="btn btn-outline-primary my-2 my-sm-0 link- bg-primary btn-sm p-2"
+			>
 				<a href="./logout" style="color: white">log out</a>
 			</p>
 		</nav>
@@ -73,11 +75,15 @@
 					{% endfor %} {% endif %} {% endwith %}
 				</div>
 				<h6 class="card-subtitle" id="wordCount">0/255</h6>
-				<form action="/tweets/create" method="post">
-					<textarea name="tweet" id="tweet" cols="30" rows="6">{{
+				<form action="/tweets/create" method="post" class="flex-column">
+					<textarea name="tweet" id="tweet" cols="53" rows="3" class="p-2">{{
 						session['tweet']
 					}}</textarea>
-					<input type="submit" value="tweet" class="btn btn-primary" />
+					<input
+						type="submit"
+						value="tweet"
+						class="btn btn-primary btn-sm p-2"
+					/>
 				</form>
 			</div>
 			<div class="feed">
@@ -100,11 +106,12 @@
 						<p style="margin: 0">likes: {{ tweet['likes'] }}</p>
 
 						{% endif %}
-						<div class="d-flex justify-content-between">
+						<div class="d-flex">
 							{% if tweet['liked']==1 %}
 							<form
 								action="/tweets/{{ tweet['tweetId'] }}/delete_like"
 								method="post"
+								class="mr-auto p-2"
 							>
 								<input
 									type="hidden"
@@ -120,6 +127,7 @@
 							<form
 								action="/tweets/{{ tweet['tweetId'] }}/add_like"
 								method="post"
+								class="mr-auto p-2"
 							>
 								<input
 									type="hidden"
@@ -135,36 +143,35 @@
 							<form
 								action="/tweets/{{ tweet['tweetId'] }}/edit"
 								method="post"
-								class="d-inline-flex"
+								class="p-2"
 							>
 								<input
 									type="hidden"
 									name="uId"
 									value="{{ session['userId'] }}"
 								/>
-								<input
+								<button
 									type="submit"
-									value="Edit"
-									class="d-inline-flex btn btn-secondary btn-sm"
-								/>
+									class="d-inline-flex btn btn-secondary btn-sm p-2"
+								>
+									<i class="far fa-edit"></i>
+								</button>
 							</form>
 							{% endif %} {% if tweet['userId']==session['userId']:%}
 
 							<form
 								action="/tweets/{{ tweet['tweetId'] }}/delete"
 								method="post"
-								class="d-inline-flex"
+								class="p-2"
 							>
 								<input
 									type="hidden"
 									name="uId"
 									value="{{ session['userId'] }}"
 								/>
-								<input
-									type="submit"
-									value="Delete"
-									class="d-inline-flex btn btn-secondary btn-sm"
-								/>
+								<button type="submit" class="btn btn-secondary btn-sm ">
+									<i class="fas fa-trash-alt"></i>
+								</button>
 							</form>
 							{% endif %}
 						</div>
@@ -173,9 +180,7 @@
 				{% endfor %}
 			</div>
 		</main>
-		{% for tweet in myFeed %}
-		<p>{{ tweet }}</p>
-		{% endfor %}
+
 		<script>
 			// function charCount(val) {
 			// 	var len = val.value.length;
