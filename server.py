@@ -100,12 +100,16 @@ def login():
     query = 'SELECT * FROM users WHERE email = %(em)s'
     data = {'em': request.form['email']}
     pw_hash = mySql.query_db(query, data)
-    session['userId'] = pw_hash[0]['id']
-    session['fName'] = pw_hash[0]['first_name']
-    session['lName'] = pw_hash[0]['last_name']
-    session['email'] = pw_hash[0]['email']
+    pw_hash = pw_hash[0]
+    print("*"*100)
+    print(pw_hash)
+    print("*"*100)
+    session['userId'] = pw_hash['id']
+    session['fName'] = pw_hash['first_name']
+    session['lName'] = pw_hash['last_name']
+    session['email'] = pw_hash['email']
     if bcrypt.check_password_hash(
-            pw_hash[0]['password'], request.form['pw1']):
+            pw_hash['password'], request.form['pw1']):
         session['login'] = True
         return redirect('/success')
     else:
@@ -125,10 +129,13 @@ def success():
 @app.route('/dashboard')
 def dashboard():
     mySql = MySQLConnection('dojo_tweets')
-    query = 'SELECT users.id as "userId", first_name, last_name, tweets.id as "tweetId", tweets, tweets.created_on as "created_on", likes, liked FROM tweets JOIN users ON users.id = tweets.users_id LEFT JOIN (select tweets_id, count(id) as "likes" from likes GROUP BY tweets_id) as mylikes ON tweets.id = mylikes.tweets_id LEFT JOIN (SELECT users_id as "uid", tweets_id, count(likes.id)>0 as "liked" FROM likes GROUP BY tweets_id, users_id) as liked ON liked.uid = %(uid)s and liked.tweets_id = tweets.id ORDER BY tweets.id desc'
+    query = 'SELECT users.id as userId, first_name, last_name, tweets.id as tweetId, tweets, tweets.created_on as created_on, likes, liked, following FROM tweets JOIN users ON users.id = tweets.users_id LEFT JOIN (SELECT tweets_id, count(id) as likes FROM likes GROUP BY tweets_id) as mylikes ON tweets.id = mylikes.tweets_id LEFT JOIN (SELECT users_id as uid, tweets_id, count(likes.id)>0 as liked FROM likes  GROUP BY tweets_id, users_id) as liked ON liked.uid = %(uid)s and liked.tweets_id = tweets.id RIGHT JOIN (SELECT followers_id, true as following FROM followers WHERE users_id = %(uid)s) as following ON users.id = following.followers_id ORDER BY tweets.id desc'
     data = {'uid': session['userId']}
     myFeed = mySql.query_db(query, data)
-
+    print("*"*50)
+    for tweet in myFeed:
+        print(tweet)
+    print("*"*50)
     return render_template('dashboard.html', myFeed=myFeed)
 
 
@@ -241,6 +248,33 @@ def update_tweet(tweetId, methods=['POST']):
         data = {'tid': tweetId}
         myTweet = mySql.query_db(query, data)
         return render_template("edit.html", myTweet=myTweet[0])
+
+
+@app.route("/users")
+def userList():
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'SELECT id, concat(first_name, " ", last_name) as name, first_name, last_name, email, follow FROM users LEFT JOIN (SELECT users_id, followers_id, 1 as follow FROM followers WHERE users_id = %(uid)s ) as following ON followers_id = users.id WHERE users.id <> %(uid)s'
+    data = {'uid': session['userId']}
+    userList = mySql.query_db(query, data)
+    return render_template('users.html', userList=userList, qry=query)
+
+
+@app.route("/<fid>/follow")
+def follow(fid):
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'INSERT INTO followers (users_id, followers_id, created_on, updated_on) VALUES(%(uid)s, %(fid)s, now(),now())'
+    data = {'uid': session['userId'], 'fid': fid}
+    mySql.query_db(query, data)
+    return redirect('/users')
+
+
+@app.route("/<fid>/unfollow")
+def unfollow(fid):
+    mySql = MySQLConnection('dojo_tweets')
+    query = 'Delete from followers where users_id=%(uid)s and followers_id= %(fid)s'
+    data = {'uid': session['userId'], 'fid': fid}
+    mySql.query_db(query, data)
+    return redirect('/users')
 
 
 if __name__ == "__main__":

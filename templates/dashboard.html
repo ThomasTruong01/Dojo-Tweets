@@ -45,14 +45,14 @@
 	</head>
 	<body>
 		<nav class="navbar navbar-dark bg-dark d-flex">
-			<a class="navbar-brand mr-auto p2" href="#">
+			<a class="navbar-brand mr-auto p-2" href="#">
 				<img
 					src="https://cutecdn.codingdojo.com/images/global/coding_dojo_logo_white_new.png"
 					class="d-inline-block align-top"
 					alt=""
 				/>
 			</a>
-			<p></p>
+			<a href="./users" class="h3 mr-auto p-2">Users</a>
 			<p class="h3 text-light p-2">Welcome {{ session['fName'] }}</p>
 			<p
 				class="btn btn-outline-primary my-2 my-sm-0 link- bg-primary btn-sm p-2"
@@ -88,7 +88,9 @@
 			</div>
 			<div class="feed">
 				<h1>Your Feed:</h1>
-				{% for tweet in myFeed %}
+				{% if myFeed|length ==0 %}
+				<p class="h4">You aren't following anyone...</p>
+				{% else %} {% for tweet in myFeed %}
 				<div class="card tweet col-sm-4">
 					<div class="card-body tweetData ">
 						<h5 class="card-title">
@@ -177,7 +179,7 @@
 						</div>
 					</div>
 				</div>
-				{% endfor %}
+				{% endfor %} {% endif %}
 			</div>
 		</main>
 

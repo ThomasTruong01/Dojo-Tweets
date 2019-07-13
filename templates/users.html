@@ -34,7 +34,7 @@
 		<script src="{{ url_for('static', filename='js/jquery.timeago.js') }}"></script>
 
 		<script src="https://kit.fontawesome.com/e3d6e9bfcd.js"></script>
-		<!-- <link rel="stylesheet" href="../static/style.css" /> -->
+		<link rel="stylesheet" href="../static/style.css" />
 		<style>
 			.card {
 				margin: 25px;
@@ -44,47 +44,61 @@
 		</style>
 	</head>
 	<body>
-		<nav class="navbar navbar-dark bg-dark">
-			<a class="navbar-brand" href="#">
+		<nav class="navbar navbar-dark bg-dark d-flex">
+			<a class="navbar-brand mr-auto p-2" href="#">
 				<img
 					src="https://cutecdn.codingdojo.com/images/global/coding_dojo_logo_white_new.png"
 					class="d-inline-block align-top"
 					alt=""
 				/>
 			</a>
-			<p></p>
-			<p class="h3 text-light">Welcome {{ session['fName'] }}</p>
-			<p class="btn btn-outline-primary my-2 my-sm-0 link- bg-primary btn-sm">
+			<a href="./dashboard" class="h3 mr-auto p-2">Dashboard</a>
+			<p class="h3 text-light p-2">Welcome {{ session['fName'] }}</p>
+			<p class="btn bg-primary btn-sm  p-2">
 				<a href="./logout" style="color: white">log out</a>
 			</p>
 		</nav>
 		<main>
-			<h1>Edit Your Tweet:</h1>
-			<div class="writeTweet card col-sm-4">
-				<div class="errMsg">
-					<!-- declare a variable called messages -->
-					{% with messages = get_flashed_messages() %}
-					<!-- check if there are any messages -->
-					{% if messages %}
-					<!-- loop through the messages -->
-					{% for message in messages %}
-					<!-- display each message in a paragraph tag -->
-					<p>{{ message }}</p>
-					{% endfor %} {% endif %} {% endwith %}
-				</div>
-				<h6 class="card-subtitle" id="wordCount">0/255</h6>
-				<form action="/tweets/{{ myTweet['id'] }}/update" method="post">
-					<textarea name="tweet" id="tweet" cols="53" rows="3">{{
-						myTweet['tweets']
-					}}</textarea>
-					<input type="submit" value="Save" class="btn btn-primary btn-sm" />
-					<input
-						type="button"
-						value="Cancel"
-						onclick="window.location.href='../../dashboard'"
-						class="btn btn-secondary btn-sm"
-					/>
-				</form>
+			<div class="errMsg">
+				<!-- declare a variable called messages -->
+				{% with messages = get_flashed_messages() %}
+				<!-- check if there are any messages -->
+				{% if messages %}
+				<!-- loop through the messages -->
+				{% for message in messages %}
+				<!-- display each message in a paragraph tag -->
+				<p>{{ message }}</p>
+				{% endfor %} {% endif %} {% endwith %}
+			</div>
+			<div class="card col-sm-8">
+				<h1>Users:</h1>
+				{{ session['userId'] }}
+				<p>{{ qry }}</p>
+				{% for user in userList %}
+				<p>{{ user }}</p>
+				{% endfor %}
+				<table class="table table-stripe table-hover">
+					<thead>
+						<tr>
+							<th scope="col">Name</th>
+							<th scope="col">Email</th>
+							<th scope="col">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for thisUser in userList %}
+						<tr>
+							<td>{{ thisUser['name'] }}</td>
+							<td>{{ thisUser['email'] }}</td>
+							{% if thisUser['follow']==1: %}
+							<td><a href="./{{ thisUser['id'] }}/unfollow">Unfollow</a></td>
+							{% else %}
+							<td><a href="./{{ thisUser['id'] }}/follow">Follow</a></td>
+							{% endif %}
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
 			</div>
 		</main>
 	</body>
